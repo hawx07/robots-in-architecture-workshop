@@ -1128,135 +1128,358 @@ void loop() {
 
 sensors.push(...hardwareElements);
 
-const examples = [
+const examples = [];
+
+const creativeExamples = [
   {
-    id: "rain-window",
-    name: "Rain Closes Window",
-    parts: ["ESP32 smart home kit", "steam sensor", "window servo", "LCD optional"],
-    concept: "The steam sensor simulates rain. When the plate gets wet, the ESP32 rotates the window servo closed; when it dries, the window opens again.",
+    id: "climate-breathing-facade",
+    name: "Climate Breathing Facade",
+    parts: ["DHT11/XHT11", "photocell", "PIR sensor", "3 servos", "fan", "RGB LED"],
+    concept: "A facade module reacts differently to heat, sunlight, and presence. It opens upper fins for ventilation, rotates shading fins in bright light, and only animates when someone is nearby.",
     build: [
-      "Steam sensor signal to GPIO34 on the smart home kit.",
-      "Window servo signal to GPIO5.",
-      "Use the kit power wiring; servo ground and ESP32 ground must be common."
+      "DHT DATA to D2, photocell divider to A0, PIR OUT to D3.",
+      "Three fin servos to D6, D9, D10 with external 5V servo power.",
+      "Fan driver or fan module to D5, RGB/status LED to PWM pins."
     ],
-    pattern: "Rain value -> wet/dry threshold -> servo window",
-    code: `#include <ESP32Servo.h>
+    pattern: "Temperature + light + presence -> comfort state -> multiple facade actuators",
+    code: `#include <DHT.h>
+#include <Servo.h>
 
-Servo windowServo;
+#define DHTPIN 2
+#define DHTTYPE DHT11
 
-const int steamPin = 34;
-const int servoPin = 5;
-const int wetThreshold = 1800;
+DHT dht(DHTPIN, DHTTYPE);
+Servo ventServo;
+Servo shadeLeft;
+Servo shadeRight;
+
+const int lightPin = A0;
+const int pirPin = 3;
+const int fanPin = 5;
+const int redPin = 11;
+const int greenPin = 12;
+
+bool hotMode = false;
+bool brightMode = false;
+
+void setStatus(bool alert) {
+  digitalWrite(redPin, alert);
+  digitalWrite(greenPin, !alert);
+}
 
 void setup() {
-  Serial.begin(115200);
-  windowServo.attach(servoPin, 500, 2500);
-  windowServo.write(90);
+  Serial.begin(9600);
+  dht.begin();
+  pinMode(pirPin, INPUT);
+  pinMode(fanPin, OUTPUT);
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  ventServo.attach(6);
+  shadeLeft.attach(9);
+  shadeRight.attach(10);
 }
 
 void loop() {
-  int rain = analogRead(steamPin);
-  Serial.println(rain);
+  float tempC = dht.readTemperature();
+  int light = analogRead(lightPin);
+  bool occupied = digitalRead(pirPin);
 
-  if (rain > wetThreshold) {
-    windowServo.write(0);
+  if (isnan(tempC)) return;
+
+  if (tempC > 28.0) hotMode = true;
+  if (tempC < 26.0) hotMode = false;
+
+  if (light > 720) brightMode = true;
+  if (light < 560) brightMode = false;
+
+  if (occupied && hotMode) {
+    ventServo.write(120);
+    analogWrite(fanPin, 190);
   } else {
-    windowServo.write(90);
+    ventServo.write(25);
+    analogWrite(fanPin, 0);
   }
 
+  if (brightMode) {
+    shadeLeft.write(35);
+    shadeRight.write(145);
+  } else {
+    shadeLeft.write(90);
+    shadeRight.write(90);
+  }
+
+  setStatus(hotMode || brightMode);
+  delay(1000);
+}`
+  },
+  {
+    id: "rain-heat-skin",
+    name: "Rain + Heat Double Skin",
+    parts: ["steam/rain sensor", "LM35 temperature sensor", "servo window", "fan", "buzzer", "LCD optional"],
+    concept: "A double-skin facade closes during rain, but if the cavity overheats it switches to a protected ventilation mode with a fan and warning state.",
+    build: [
+      "Rain/steam sensor to A3 and LM35 to A1.",
+      "Window servo to D9, fan driver to D5, buzzer to D8.",
+      "Use separate 5V power for the fan and servo, with shared ground."
+    ],
+    pattern: "Rain + heat -> mode selection -> window, fan, and warning feedback",
+    code: `#include <Servo.h>
+
+Servo windowServo;
+
+const int rainPin = A3;
+const int tempPin = A1;
+const int fanPin = 5;
+const int buzzerPin = 8;
+
+enum Mode { OPEN_DRY, CLOSED_RAIN, PROTECTED_VENT };
+Mode mode = OPEN_DRY;
+
+float readTempC() {
+  int raw = analogRead(tempPin);
+  return raw * (5.0 / 1023.0) * 100.0;
+}
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(fanPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  windowServo.attach(9);
+}
+
+void loop() {
+  int rain = analogRead(rainPin);
+  float tempC = readTempC();
+
+  bool wet = rain > 520;
+  bool overheated = tempC > 31.0;
+
+  if (wet && overheated) mode = PROTECTED_VENT;
+  else if (wet) mode = CLOSED_RAIN;
+  else mode = OPEN_DRY;
+
+  if (mode == OPEN_DRY) {
+    windowServo.write(110);
+    analogWrite(fanPin, 0);
+    noTone(buzzerPin);
+  } else if (mode == CLOSED_RAIN) {
+    windowServo.write(15);
+    analogWrite(fanPin, 0);
+    noTone(buzzerPin);
+  } else {
+    windowServo.write(45);
+    analogWrite(fanPin, 220);
+    tone(buzzerPin, 900, 80);
+  }
+
+  Serial.print("rain=");
+  Serial.print(rain);
+  Serial.print(" temp=");
+  Serial.print(tempC);
+  Serial.print(" mode=");
+  Serial.println(mode);
+  delay(500);
+}`
+  },
+  {
+    id: "material-curing-rig",
+    name: "Material Curing Turntable",
+    parts: ["LM35 or thermistor", "steam/moisture plate", "stepper motor", "servo marker", "LED/buzzer"],
+    concept: "A rotating test rig watches a wet material sample dry. It slowly indexes the sample, marks the drying state with a servo pointer, and alerts when the material crosses a threshold.",
+    build: [
+      "Temperature sensor to A1 and wetness plate to A2.",
+      "Stepper driver IN1-IN4 to D8-D11.",
+      "Servo marker to D6 and buzzer/LED to D5."
+    ],
+    pattern: "Material state over time -> turntable indexing -> physical indicator",
+    code: `#include <Stepper.h>
+#include <Servo.h>
+
+const int stepsPerTurn = 2048;
+Stepper tableMotor(stepsPerTurn, 8, 10, 9, 11);
+Servo markerServo;
+
+const int wetPin = A2;
+const int tempPin = A1;
+const int alertPin = 5;
+
+unsigned long lastStepTime = 0;
+int wetAverage = 0;
+
+void setup() {
+  Serial.begin(9600);
+  tableMotor.setSpeed(8);
+  markerServo.attach(6);
+  pinMode(alertPin, OUTPUT);
+  wetAverage = analogRead(wetPin);
+}
+
+void loop() {
+  int wetRaw = analogRead(wetPin);
+  wetAverage = (wetAverage * 9 + wetRaw) / 10;
+
+  int tempRaw = analogRead(tempPin);
+  float tempC = tempRaw * (5.0 / 1023.0) * 100.0;
+
+  int dryness = map(wetAverage, 850, 350, 0, 100);
+  dryness = constrain(dryness, 0, 100);
+  markerServo.write(map(dryness, 0, 100, 20, 160));
+
+  if (millis() - lastStepTime > 5000) {
+    tableMotor.step(128);
+    lastStepTime = millis();
+  }
+
+  bool ready = dryness > 75 && tempC < 35.0;
+  digitalWrite(alertPin, ready);
+
+  Serial.print("dryness=");
+  Serial.print(dryness);
+  Serial.print(" temp=");
+  Serial.println(tempC);
   delay(300);
 }`
   },
   {
-    id: "gas-ventilation",
-    name: "Gas Alarm Ventilation",
-    parts: ["ESP32 smart home kit", "gas sensor", "130 fan motor", "buzzer"],
-    concept: "The gas sensor triggers an alarm behavior: buzzer on and fan running. This is a safe threshold demo, not a calibrated safety device.",
+    id: "acoustic-light-field",
+    name: "Acoustic Light Field",
+    parts: ["sound sensor", "photocell", "potentiometer", "RGB LEDs", "2 servos"],
+    concept: "A small room model reacts to activity: sound pulses ripple through light, while a pair of servo apertures open more when the space is both dark and loud.",
     build: [
-      "Gas sensor signal to GPIO23 on the smart home kit.",
-      "Fan motor module IN- to GPIO18 and IN+ to GPIO19.",
-      "Buzzer signal to GPIO25."
+      "Sound sensor to A5, photocell to A0, sensitivity knob to A1.",
+      "RGB LED channels or LED strips to PWM pins through drivers.",
+      "Two aperture servos to D9 and D10."
     ],
-    pattern: "Gas value -> warning threshold -> fan + buzzer",
-    code: `const int gasPin = 23;
-const int fanA = 18;
-const int fanB = 19;
-const int buzzerPin = 25;
+    pattern: "Sound envelope + darkness + manual sensitivity -> light and aperture movement",
+    code: `#include <Servo.h>
 
-const int gasThreshold = 1;
+Servo apertureA;
+Servo apertureB;
+
+const int soundPin = A5;
+const int lightPin = A0;
+const int knobPin = A1;
+const int redPin = 3;
+const int bluePin = 5;
+
+int soundEnvelope = 0;
 
 void setup() {
-  Serial.begin(115200);
-  pinMode(gasPin, INPUT);
-  pinMode(fanA, OUTPUT);
-  pinMode(fanB, OUTPUT);
-  pinMode(buzzerPin, OUTPUT);
+  apertureA.attach(9);
+  apertureB.attach(10);
+  pinMode(redPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
 }
 
 void loop() {
-  int gas = digitalRead(gasPin);
-  Serial.println(gas);
+  int sound = analogRead(soundPin);
+  int light = analogRead(lightPin);
+  int knob = analogRead(knobPin);
+  int threshold = map(knob, 0, 1023, 520, 760);
 
-  bool alarm = gas == gasThreshold;
-  digitalWrite(buzzerPin, alarm);
-  digitalWrite(fanA, alarm);
-  digitalWrite(fanB, LOW);
+  int pulse = max(0, sound - threshold);
+  soundEnvelope = max(pulse, soundEnvelope - 8);
+  soundEnvelope = constrain(soundEnvelope, 0, 300);
+
+  bool dark = light < 420;
+  int aperture = dark ? map(soundEnvelope, 0, 300, 20, 140) : 20;
+
+  apertureA.write(aperture);
+  apertureB.write(160 - aperture);
+  analogWrite(redPin, map(soundEnvelope, 0, 300, 0, 255));
+  analogWrite(bluePin, dark ? 120 : 20);
+
+  delay(30);
+}`
+  },
+  {
+    id: "rfid-kinetic-thresholds",
+    name: "RFID Mode Wall",
+    parts: ["RFID reader", "photocell", "temperature sensor", "servo latch", "LEDs", "buzzer"],
+    concept: "Different RFID cards switch the wall between exhibition modes. Each mode changes the light threshold, servo latch behavior, and warning feedback.",
+    build: [
+      "RFID reader to SPI pins or the smart-home RFID connector.",
+      "Photocell to A0 and temperature sensor to A1.",
+      "Latch servo to D9, status LEDs to PWM pins, buzzer to D8."
+    ],
+    pattern: "Physical identity token -> behavior profile -> sensor thresholds and actuator response",
+    code: `#include <SPI.h>
+#include <MFRC522.h>
+#include <Servo.h>
+
+#define SS_PIN 10
+#define RST_PIN 7
+
+MFRC522 rfid(SS_PIN, RST_PIN);
+Servo latchServo;
+
+const int lightPin = A0;
+const int tempPin = A1;
+const int buzzerPin = 8;
+const int ledPin = 6;
+
+int mode = 0;
+
+void readCardMode() {
+  if (!rfid.PICC_IsNewCardPresent()) return;
+  if (!rfid.PICC_ReadCardSerial()) return;
+
+  byte lastByte = rfid.uid.uidByte[rfid.uid.size - 1];
+  mode = lastByte % 3;
+  tone(buzzerPin, 700 + mode * 200, 120);
+  rfid.PICC_HaltA();
+}
+
+void setup() {
+  Serial.begin(9600);
+  SPI.begin();
+  rfid.PCD_Init();
+  latchServo.attach(9);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  readCardMode();
+
+  int light = analogRead(lightPin);
+  float tempC = analogRead(tempPin) * (5.0 / 1023.0) * 100.0;
+
+  int lightLimit[] = {350, 550, 750};
+  int openAngle[] = {35, 90, 145};
+  bool active = light < lightLimit[mode] || tempC > 30.0;
+
+  latchServo.write(active ? openAngle[mode] : 10);
+  analogWrite(ledPin, active ? 220 : 25);
+
+  Serial.print("mode=");
+  Serial.print(mode);
+  Serial.print(" light=");
+  Serial.print(light);
+  Serial.print(" temp=");
+  Serial.println(tempC);
   delay(200);
 }`
   },
   {
-    id: "night-presence",
-    name: "Night Presence Light",
-    parts: ["PIR motion sensor", "photocell", "LED module", "buzzer optional"],
-    concept: "The model turns a light on only when it is dark and someone moves nearby.",
+    id: "pan-tilt-proximity-map",
+    name: "Pan-Tilt Proximity Mapper",
+    parts: ["ultrasonic sensor", "2 servos", "joystick", "LED/buzzer", "optional LCD"],
+    concept: "A custom scanning head sweeps an ultrasonic sensor over a model and reacts to the closest direction. Manual joystick override lets students compare automatic and hand control.",
     build: [
-      "PIR OUT to D3.",
-      "Photocell divider to A0.",
-      "LED signal to D6 or use a normal LED with resistor."
+      "Ultrasonic sensor mounted on a two-servo pan/tilt bracket.",
+      "TRIG to D4, ECHO to D5, pan servo to D9, tilt servo to D10.",
+      "Joystick to A0/A1 for manual override, buzzer to D8."
     ],
-    pattern: "Light level + motion -> conditional output",
-    code: `const int pirPin = 3;
-const int lightPin = A0;
-const int ledPin = 6;
+    pattern: "Servo scan -> distance map -> closest direction response",
+    code: `#include <Servo.h>
 
-const int darkThreshold = 450;
+Servo panServo;
+Servo tiltServo;
 
-void setup() {
-  pinMode(pirPin, INPUT);
-  pinMode(ledPin, OUTPUT);
-  Serial.begin(9600);
-}
-
-void loop() {
-  int light = analogRead(lightPin);
-  bool motion = digitalRead(pirPin);
-  bool shouldLight = motion && light < darkThreshold;
-
-  digitalWrite(ledPin, shouldLight);
-  Serial.println(light);
-  delay(100);
-}`
-  },
-  {
-    id: "obstacle-rover",
-    name: "Obstacle Avoiding Rover",
-    parts: ["ELEGOO car", "ultrasonic sensor", "TB6612 motor driver", "DC motors"],
-    concept: "The rover drives forward until an object is close, reverses briefly, then turns away.",
-    build: [
-      "Use the ELEGOO car shield or driver pins from the kit tutorial.",
-      "HC-SR04 trigger and echo use two digital pins.",
-      "The car kit already includes the battery and motor driver wiring."
-    ],
-    pattern: "Distance sensor -> if/else behavior -> motor driver",
-    code: `const int trigPin = 9;
-const int echoPin = 10;
-
-const int leftA = 4;
-const int leftB = 5;
-const int rightA = 6;
-const int rightB = 7;
-const int leftPWM = 3;
-const int rightPWM = 11;
+const int trigPin = 4;
+const int echoPin = 5;
+const int buzzerPin = 8;
 
 float distanceCm() {
   digitalWrite(trigPin, LOW);
@@ -1264,202 +1487,133 @@ float distanceCm() {
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
-  long duration = pulseIn(echoPin, HIGH, 30000);
+  long duration = pulseIn(echoPin, HIGH, 25000);
   return duration * 0.0343 / 2.0;
-}
-
-void motors(int leftSpeed, int rightSpeed) {
-  digitalWrite(leftA, leftSpeed >= 0);
-  digitalWrite(leftB, leftSpeed < 0);
-  digitalWrite(rightA, rightSpeed >= 0);
-  digitalWrite(rightB, rightSpeed < 0);
-  analogWrite(leftPWM, abs(leftSpeed));
-  analogWrite(rightPWM, abs(rightSpeed));
-}
-
-void setup() {
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  pinMode(leftA, OUTPUT);
-  pinMode(leftB, OUTPUT);
-  pinMode(rightA, OUTPUT);
-  pinMode(rightB, OUTPUT);
-  pinMode(leftPWM, OUTPUT);
-  pinMode(rightPWM, OUTPUT);
-}
-
-void loop() {
-  float d = distanceCm();
-
-  if (d > 0 && d < 20) {
-    motors(-140, -140);
-    delay(300);
-    motors(150, -150);
-    delay(450);
-  } else {
-    motors(160, 160);
-  }
-}`
-  },
-  {
-    id: "line-rover",
-    name: "Line Following Drawing Rover",
-    parts: ["ELEGOO car", "line tracking module", "servo pen lift optional"],
-    concept: "The rover follows black tape on a floor plan. Add a servo-held pen to turn navigation into a drawing tool.",
-    build: [
-      "Use two line sensor outputs for left and right detection.",
-      "Use the car kit motor driver pins from its tutorial.",
-      "Attach a pen lift servo only if the power supply can handle it."
-    ],
-    pattern: "Left/right line state -> steering -> drawing behavior",
-    code: `const int leftLine = 2;
-const int rightLine = 3;
-const int leftA = 4;
-const int leftB = 5;
-const int rightA = 6;
-const int rightB = 7;
-const int leftPWM = 10;
-const int rightPWM = 11;
-
-void drive(int leftSpeed, int rightSpeed) {
-  digitalWrite(leftA, leftSpeed >= 0);
-  digitalWrite(leftB, leftSpeed < 0);
-  digitalWrite(rightA, rightSpeed >= 0);
-  digitalWrite(rightB, rightSpeed < 0);
-  analogWrite(leftPWM, abs(leftSpeed));
-  analogWrite(rightPWM, abs(rightSpeed));
-}
-
-void setup() {
-  pinMode(leftLine, INPUT);
-  pinMode(rightLine, INPUT);
-  pinMode(leftA, OUTPUT);
-  pinMode(leftB, OUTPUT);
-  pinMode(rightA, OUTPUT);
-  pinMode(rightB, OUTPUT);
-  pinMode(leftPWM, OUTPUT);
-  pinMode(rightPWM, OUTPUT);
-}
-
-void loop() {
-  bool left = digitalRead(leftLine);
-  bool right = digitalRead(rightLine);
-
-  if (left && right) {
-    drive(150, 150);
-  } else if (left) {
-    drive(80, 150);
-  } else if (right) {
-    drive(150, 80);
-  } else {
-    drive(0, 0);
-  }
-}`
-  },
-  {
-    id: "joystick-arm",
-    name: "Joystick Robot Arm",
-    parts: ["mini robot arm", "2 joystick modules", "4 MG90S/SG90 servos"],
-    concept: "Two joysticks control four robot-arm degrees of freedom: base, shoulder, elbow, and gripper.",
-    build: [
-      "Joystick axes to A0-A3.",
-      "Servo signals to D6, D9, D10, D11.",
-      "Use external servo power; do not power four servos from USB."
-    ],
-    pattern: "Analog joystick values -> mapped servo angles -> arm pose",
-    code: `#include <Servo.h>
-
-Servo baseServo;
-Servo shoulderServo;
-Servo elbowServo;
-Servo gripperServo;
-
-void setup() {
-  baseServo.attach(6);
-  shoulderServo.attach(9);
-  elbowServo.attach(10);
-  gripperServo.attach(11);
-}
-
-void loop() {
-  baseServo.write(map(analogRead(A0), 0, 1023, 0, 180));
-  shoulderServo.write(map(analogRead(A1), 0, 1023, 30, 150));
-  elbowServo.write(map(analogRead(A2), 0, 1023, 30, 150));
-  gripperServo.write(map(analogRead(A3), 0, 1023, 20, 120));
-  delay(15);
-}`
-  },
-  {
-    id: "rfid-door",
-    name: "RFID Door Servo",
-    parts: ["RFID module", "servo", "LCD optional", "smart home door"],
-    concept: "A known RFID tag opens the door servo. Unknown tags keep it closed.",
-    build: [
-      "Use the RFID wiring for your exact module: SPI RC522 or Keyestudio I2C RFID.",
-      "Door servo signal to D9 on UNO or GPIO13 on the ESP32 smart home kit.",
-      "Add the LCD to show OPEN or DENIED if time allows."
-    ],
-    pattern: "Card ID -> permission check -> door servo",
-    code: `#include <SPI.h>
-#include <MFRC522.h>
-#include <Servo.h>
-
-#define SS_PIN 10
-#define RST_PIN 8
-
-MFRC522 rfid(SS_PIN, RST_PIN);
-Servo doorServo;
-
-byte allowedUid[] = {0xDE, 0xAD, 0xBE, 0xEF};
-
-bool uidMatches() {
-  if (rfid.uid.size != sizeof(allowedUid)) return false;
-  for (byte i = 0; i < rfid.uid.size; i++) {
-    if (rfid.uid.uidByte[i] != allowedUid[i]) return false;
-  }
-  return true;
 }
 
 void setup() {
   Serial.begin(9600);
-  SPI.begin();
-  rfid.PCD_Init();
-  doorServo.attach(9);
-  doorServo.write(0);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(buzzerPin, OUTPUT);
+  panServo.attach(9);
+  tiltServo.attach(10);
+  tiltServo.write(80);
 }
 
 void loop() {
-  if (!rfid.PICC_IsNewCardPresent()) return;
-  if (!rfid.PICC_ReadCardSerial()) return;
+  int closestAngle = 90;
+  float closestDistance = 999;
 
-  if (uidMatches()) {
-    doorServo.write(90);
-    delay(2500);
-    doorServo.write(0);
+  for (int angle = 35; angle <= 145; angle += 10) {
+    panServo.write(angle);
+    delay(120);
+    float d = distanceCm();
+    if (d > 0 && d < closestDistance) {
+      closestDistance = d;
+      closestAngle = angle;
+    }
   }
 
-  rfid.PICC_HaltA();
+  panServo.write(closestAngle);
+  if (closestDistance < 25) {
+    tone(buzzerPin, 1200, 80);
+    tiltServo.write(120);
+  } else {
+    tiltServo.write(80);
+  }
+
+  Serial.print("closest angle=");
+  Serial.print(closestAngle);
+  Serial.print(" distance=");
+  Serial.println(closestDistance);
+  delay(400);
 }`
   },
   {
-    id: "camera-observer",
-    name: "AI Camera Observer",
-    parts: ["Raspberry Pi Zero 2 W", "Raspberry Pi AI Camera", "robot car or arm as actuator"],
-    concept: "The camera is not an Arduino sensor. Use the Pi for vision and send simple commands to an Arduino/ESP32 over serial, such as LEFT, RIGHT, OPEN, or STOP.",
+    id: "adaptive-threshold-lab",
+    name: "Adaptive Threshold Lab",
+    parts: ["potentiometer", "PIR", "light sensor", "temperature sensor", "servo", "fan", "LEDs"],
+    concept: "A teaching rig where the potentiometer changes the system sensitivity live. Students can see how one threshold affects comfort decisions and motion.",
     build: [
-      "Run the AI camera on the Raspberry Pi.",
-      "Connect Pi USB/serial to an Arduino or ESP32 controller.",
-      "Arduino receives text commands and moves servos or motors."
+      "Potentiometer to A2, light to A0, temperature to A1, PIR to D3.",
+      "Servo indicator to D9, fan driver to D5, LEDs to D6/D7.",
+      "Mark the dial with paper labels so threshold changes are visible."
     ],
-    pattern: "Vision on Pi -> serial command -> Arduino actuator",
+    pattern: "Manual calibration -> combined sensor score -> actuator mix",
     code: `#include <Servo.h>
 
-Servo pointerServo;
+Servo indicator;
+
+const int lightPin = A0;
+const int tempPin = A1;
+const int knobPin = A2;
+const int pirPin = 3;
+const int fanPin = 5;
+const int okLed = 6;
+const int alertLed = 7;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(pirPin, INPUT);
+  pinMode(fanPin, OUTPUT);
+  pinMode(okLed, OUTPUT);
+  pinMode(alertLed, OUTPUT);
+  indicator.attach(9);
+}
+
+void loop() {
+  int light = analogRead(lightPin);
+  float tempC = analogRead(tempPin) * (5.0 / 1023.0) * 100.0;
+  int knob = analogRead(knobPin);
+  bool occupied = digitalRead(pirPin);
+
+  int sensitivity = map(knob, 0, 1023, 20, 80);
+  int heatScore = constrain((int)((tempC - 22.0) * 10), 0, 100);
+  int lightScore = map(light, 0, 1023, 0, 100);
+  int presenceScore = occupied ? 30 : 0;
+  int score = (heatScore + lightScore + presenceScore) / 2;
+
+  bool active = score > sensitivity;
+  indicator.write(map(score, 0, 100, 20, 160));
+  analogWrite(fanPin, active ? map(score, 0, 100, 90, 230) : 0);
+  digitalWrite(okLed, !active);
+  digitalWrite(alertLed, active);
+
+  Serial.print("score=");
+  Serial.print(score);
+  Serial.print(" threshold=");
+  Serial.println(sensitivity);
+  delay(200);
+}`
+  },
+  {
+    id: "vision-serial-installation",
+    name: "Vision-Driven Kinetic Marker",
+    parts: ["Raspberry Pi AI Camera", "Arduino/ESP32", "2 servos", "LED strip", "buzzer"],
+    concept: "The Pi handles vision and sends simple text commands. The Arduino turns those commands into physical movement, so the installation remains modular and easy to debug.",
+    build: [
+      "AI camera connects to the Raspberry Pi, not directly to Arduino.",
+      "Pi sends serial commands over USB: LEFT, RIGHT, CENTER, ALERT, IDLE.",
+      "Arduino moves two servos and feedback LEDs from those text commands."
+    ],
+    pattern: "Vision computer -> serial command protocol -> kinetic marker",
+    code: `#include <Servo.h>
+
+Servo panServo;
+Servo markerServo;
+
+const int ledPin = 6;
+const int buzzerPin = 8;
 
 void setup() {
   Serial.begin(115200);
-  pointerServo.attach(9);
-  pointerServo.write(90);
+  panServo.attach(9);
+  markerServo.attach(10);
+  pinMode(ledPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  panServo.write(90);
+  markerServo.write(30);
 }
 
 void loop() {
@@ -1468,9 +1622,17 @@ void loop() {
   String command = Serial.readStringUntil('\\n');
   command.trim();
 
-  if (command == "LEFT") pointerServo.write(40);
-  if (command == "CENTER") pointerServo.write(90);
-  if (command == "RIGHT") pointerServo.write(140);
+  if (command == "LEFT") panServo.write(45);
+  else if (command == "RIGHT") panServo.write(135);
+  else if (command == "CENTER") panServo.write(90);
+  else if (command == "ALERT") {
+    markerServo.write(130);
+    analogWrite(ledPin, 255);
+    tone(buzzerPin, 1000, 80);
+  } else if (command == "IDLE") {
+    markerServo.write(30);
+    analogWrite(ledPin, 25);
+  }
 }`
   }
 ];
@@ -1479,13 +1641,13 @@ const actuatorNotes = [
   {
     name: "Servo",
     pins: "Signal pin plus 5V and GND",
-    use: "Included in the smart home, robot arm, starter, rover camera gimbal, and crawling robot kits.",
+    use: "Best for custom hinges, grippers, shutters, pointers, apertures, and small kinetic facade modules.",
     caution: "Use external 5V power for multiple servos; share GND with the controller."
   },
   {
     name: "DC Motor / Fan",
-    pins: "Needs a motor driver or kit fan module",
-    use: "Used for rover wheels, smart home ventilation, and simple material movement.",
+    pins: "Needs a motor driver, transistor, or MOSFET module",
+    use: "Best for ventilation, rotating samples, pumps, moving belts, and continuous material experiments.",
     caution: "Never drive a motor directly from an Arduino pin."
   },
   {

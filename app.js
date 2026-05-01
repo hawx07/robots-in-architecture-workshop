@@ -177,7 +177,8 @@ function renderExamples() {
     </article>
   `).join("");
 
-  grid.innerHTML = examples.map(exampleCard).join("");
+  const systemExamples = typeof creativeExamples !== "undefined" ? creativeExamples : examples;
+  grid.innerHTML = systemExamples.map(exampleCard).join("");
 }
 
 function bindExpandableCards() {

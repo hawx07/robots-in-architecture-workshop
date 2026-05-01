@@ -722,7 +722,8 @@ dt {
   }
 
   main {
-    width: min(100vw - 24px, 1180px);
+    width: calc(100vw - 24px);
+    max-width: 1180px;
     padding-top: 16px;
   }
 
