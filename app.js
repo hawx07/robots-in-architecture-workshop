@@ -49,10 +49,12 @@ function sensorCard(sensor) {
   const searchText = [
     sensor.name,
     sensor.part,
+    sensor.kit,
     sensor.type,
     sensor.intro,
     sensor.workshopUse,
-    sensor.pins.flat().join(" ")
+    sensor.pins.flat().join(" "),
+    sensor.notes.join(" ")
   ].join(" ").toLowerCase();
 
   return `
@@ -61,7 +63,7 @@ function sensorCard(sensor) {
         <span class="icon-badge">${iconSvg(sensor.icon)}</span>
         <span class="card-title">
           <strong>${sensor.name}</strong>
-          <small>${sensor.part} · ${sensor.kit}</small>
+          <small>${sensor.part} - ${sensor.kit}</small>
         </span>
         <span class="type-chip">${sensor.type}</span>
         <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
@@ -70,7 +72,7 @@ function sensorCard(sensor) {
         <p class="intro">${sensor.intro}</p>
         <div class="detail-layout">
           <div>
-            <h3>Wiring</h3>
+            <h3>${sensor.connectionTitle || "Wiring"}</h3>
             <ul class="pin-list">${pinRows(sensor.pins)}</ul>
           </div>
           <div>
@@ -82,8 +84,7 @@ function sensorCard(sensor) {
             <ul class="notes">${sensor.notes.map((note) => `<li>${note}</li>`).join("")}</ul>
           </div>
         </div>
-        <h3>${sensor.codeTitle}</h3>
-        ${codeBlock(sensor.code, `${sensor.id}-code`)}
+        ${sensor.code ? `<h3>${sensor.codeTitle || "Starter Code"}</h3>${codeBlock(sensor.code, `${sensor.id}-code`)}` : ""}
       </div>
     </article>
   `;

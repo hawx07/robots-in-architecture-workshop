@@ -659,6 +659,607 @@ void loop() {
   }
 ];
 
+const hardwareElements = [
+  {
+    id: "arduino-uno",
+    name: "Arduino Uno / Compatible Board",
+    part: "microcontroller board",
+    type: "controller",
+    kit: "starter kits, robot car, robot arms",
+    icon: "axis",
+    intro: "The main beginner controller for sensors and actuators. It reads pins, makes decisions, and drives servos, LEDs, buzzers, relays, and motor drivers.",
+    connectionTitle: "Core Connections",
+    pins: [
+      ["USB", "programming + Serial Monitor"],
+      ["5V / GND", "sensor power"],
+      ["Digital pins", "buttons, PIR, buzzer, relay"],
+      ["Analog pins", "LDR, joystick, temperature"]
+    ],
+    workshopUse: "Use it for the first day of exercises because the wiring and Arduino IDE examples are simple and well documented.",
+    notes: [
+      "Digital pins are for on/off signals and PWM output.",
+      "Analog pins read changing voltages from 0 to 5V.",
+      "Do not power motors directly from Arduino pins."
+    ],
+    codeTitle: "Minimal pin test",
+    code: `const int ledPin = 13;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(ledPin, HIGH);
+  delay(500);
+  digitalWrite(ledPin, LOW);
+  delay(500);
+}`
+  },
+  {
+    id: "esp32-smart-home",
+    name: "ESP32 Smart Home Board",
+    part: "Keyestudio smart home controller",
+    type: "controller",
+    kit: "Keyestudio ESP32 smart home kit",
+    icon: "axis",
+    intro: "A Wi-Fi capable controller mounted inside the smart home kit. It connects the house modules such as PIR, gas, steam, RFID, fan, servos, LCD, LEDs, and buzzer.",
+    connectionTitle: "Typical Kit Pins",
+    pins: [
+      ["PIR", "GPIO14"],
+      ["Steam/rain", "GPIO34"],
+      ["Gas", "GPIO23"],
+      ["Fan", "GPIO18 + GPIO19"]
+    ],
+    workshopUse: "Use it for architecture scenarios: automatic window, alarm ventilation, access control, and remote-controlled house behavior.",
+    notes: [
+      "ESP32 analog values are 0-4095, not 0-1023 like Arduino Uno.",
+      "GPIO34 is input-only.",
+      "Most ESP32 pins are 3.3V logic; check modules before connecting 5V signals."
+    ],
+    codeTitle: "ESP32 input/output test",
+    code: `const int inputPin = 14;
+const int outputPin = 25;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(inputPin, INPUT);
+  pinMode(outputPin, OUTPUT);
+}
+
+void loop() {
+  int value = digitalRead(inputPin);
+  digitalWrite(outputPin, value);
+  Serial.println(value);
+  delay(100);
+}`
+  },
+  {
+    id: "raspberry-pi",
+    name: "Raspberry Pi Zero 2 W",
+    part: "single-board computer",
+    type: "controller",
+    kit: "Pi Zero 2 W + battery + heatsink case",
+    icon: "axis",
+    intro: "A small Linux computer for camera work, AI experiments, web dashboards, and higher-level control. It is not a direct Arduino replacement for simple pin lessons.",
+    connectionTitle: "Main Roles",
+    pins: [
+      ["USB", "programming, serial, power"],
+      ["Wi-Fi", "web interface and remote control"],
+      ["Camera connector", "AI camera"],
+      ["GPIO", "advanced users only"]
+    ],
+    workshopUse: "Use the Pi when the project needs vision, networking, or a small web server. Send simple commands from the Pi to Arduino/ESP32 for motion.",
+    notes: [
+      "Boot time is slower than Arduino because it runs an operating system.",
+      "Use the battery board for mobile demos.",
+      "Keep AI camera processing on the Pi and actuator timing on Arduino/ESP32."
+    ]
+  },
+  {
+    id: "ai-camera",
+    name: "Raspberry Pi AI Camera",
+    part: "camera module",
+    type: "vision",
+    kit: "Raspberry Pi AI Camera",
+    icon: "motion",
+    intro: "A camera for visual sensing. It can detect objects, movement, or spatial conditions when connected to the Raspberry Pi.",
+    connectionTitle: "Connections",
+    pins: [
+      ["Camera cable", "Raspberry Pi camera port"],
+      ["Processing", "Raspberry Pi"],
+      ["Output to Arduino", "USB serial commands"],
+      ["Power", "Pi battery or USB supply"]
+    ],
+    workshopUse: "Make a model respond to where people stand, track a marker, observe a drawing robot, or trigger a servo when an object appears.",
+    notes: [
+      "Arduino code cannot read this camera directly.",
+      "Use simple serial words such as LEFT, RIGHT, OPEN, STOP.",
+      "Lighting and background strongly affect camera experiments."
+    ]
+  },
+  {
+    id: "robot-car",
+    name: "Smart Robot Car",
+    part: "ELEGOO car with camera",
+    type: "platform",
+    kit: "ELEGOO Smart Robot Car V4",
+    icon: "track",
+    intro: "A complete mobile robot platform with chassis, motors, motor driver, ultrasonic sensor, line tracking, camera mount, battery, and remote-control options.",
+    connectionTitle: "Built-In Elements",
+    pins: [
+      ["Drive", "2 DC motors + motor driver"],
+      ["Navigation", "ultrasonic + line tracking"],
+      ["View", "camera / gimbal depending on build"],
+      ["Power", "battery pack"]
+    ],
+    workshopUse: "Use it for path following, obstacle avoidance, mapping a floor plan, drawing with a pen, or carrying small sensors through a model.",
+    notes: [
+      "Start with the official car examples before changing pin maps.",
+      "Keep wires away from wheels.",
+      "Battery voltage affects motor speed and sensor stability."
+    ]
+  },
+  {
+    id: "mini-robot-arm",
+    name: "Mini Robot Arm",
+    part: "4DOF servo arm kit",
+    type: "platform",
+    kit: "two mini robot arm kits",
+    icon: "joystick",
+    intro: "A small servo arm for pick-and-place, pointing, drawing, material pressing, or repetitive architectural model actions.",
+    connectionTitle: "Built-In Elements",
+    pins: [
+      ["Base", "servo signal"],
+      ["Shoulder", "servo signal"],
+      ["Elbow", "servo signal"],
+      ["Gripper", "servo signal"]
+    ],
+    workshopUse: "Teach joint control, calibration, inverse thinking, and repeatable tool paths without industrial robot complexity.",
+    notes: [
+      "Power several servos from an external 5V supply.",
+      "Write down safe angle limits before running sequences.",
+      "Use joysticks first, then recorded poses."
+    ]
+  },
+  {
+    id: "fabri-arm",
+    name: "Fabri Creator Robot Arm Parts",
+    part: "larger robot arm kit",
+    type: "platform",
+    kit: "Robot Arm - Complete Parts",
+    icon: "axis",
+    intro: "A more substantial arm assembly for custom end effectors and stronger spatial experiments than the small acrylic arm.",
+    connectionTitle: "Use Planning",
+    pins: [
+      ["Structure", "assembled arm parts"],
+      ["Joints", "servos or motors from kit"],
+      ["Controller", "Arduino-compatible board"],
+      ["End effector", "custom 3D printed tool"]
+    ],
+    workshopUse: "Use it for group demos such as pressing material, moving a marker, pushing model panels, or presenting robotic arm logic.",
+    notes: [
+      "Build and test one joint at a time.",
+      "Check mechanical stops before powering servos.",
+      "Use 3D printed adapters for architectural tools."
+    ]
+  },
+  {
+    id: "spider-robot",
+    name: "Crawling Robot",
+    part: "Freenove spider / crawling robot",
+    type: "platform",
+    kit: "Arduino robot spider",
+    icon: "motion",
+    intro: "A multi-servo walking robot. It is useful for understanding gait, balance, repeated motion, and body coordination.",
+    connectionTitle: "Built-In Elements",
+    pins: [
+      ["Legs", "multiple servos"],
+      ["Controller", "kit controller board"],
+      ["Power", "battery pack"],
+      ["Optional sensing", "distance or remote modules"]
+    ],
+    workshopUse: "Use it as an advanced demonstrator after students understand single-servo and robot-arm motion.",
+    notes: [
+      "Calibrate servo centers carefully.",
+      "Walking robots are power hungry.",
+      "Debug one leg pair before running full gait code."
+    ]
+  },
+  {
+    id: "servo",
+    name: "Servo Motor",
+    part: "SG90 / MG90S style servo",
+    type: "actuator",
+    kit: "smart home, arms, starter kit, robot car",
+    icon: "dial",
+    intro: "A motor that moves to a commanded angle. It is the most useful actuator for doors, windows, grippers, pointers, joints, and kinetic facade panels.",
+    connectionTitle: "Wiring",
+    pins: [
+      ["Signal", "PWM-capable digital pin"],
+      ["Red", "5V external supply for loaded servos"],
+      ["Brown/black", "GND"],
+      ["Common ground", "servo GND to controller GND"]
+    ],
+    workshopUse: "Open windows, rotate fins, lift pens, grip objects, move robot arms, and create repeatable kinetic model movements.",
+    notes: [
+      "Do not power multiple servos from Arduino USB.",
+      "Limit angle ranges to avoid forcing the mechanism.",
+      "Servo.write(90) usually means center."
+    ],
+    codeTitle: "Sweep a servo",
+    code: `#include <Servo.h>
+
+Servo servo;
+
+void setup() {
+  servo.attach(9);
+}
+
+void loop() {
+  servo.write(20);
+  delay(800);
+  servo.write(140);
+  delay(800);
+}`
+  },
+  {
+    id: "dc-motor",
+    name: "DC Motor / Fan",
+    part: "wheel motors and smart home fan",
+    type: "actuator",
+    kit: "robot car + smart home kit",
+    icon: "wave",
+    intro: "A continuous-rotation motor. DC motors are used for rover wheels, fans, pumps, and spinning prototypes.",
+    connectionTitle: "Wiring",
+    pins: [
+      ["Motor", "driver output or fan module"],
+      ["Direction", "driver IN pins"],
+      ["Speed", "PWM enable pin"],
+      ["Power", "battery or motor supply"]
+    ],
+    workshopUse: "Drive rovers, create ventilation, spin material samples, or test continuous robotic behavior.",
+    notes: [
+      "Never connect a DC motor directly to an Arduino pin.",
+      "Use a motor driver, transistor module, or the kit fan module.",
+      "Always share GND between motor driver and controller."
+    ],
+    codeTitle: "PWM motor speed",
+    code: `const int motorPin = 5;
+
+void setup() {
+  pinMode(motorPin, OUTPUT);
+}
+
+void loop() {
+  analogWrite(motorPin, 80);
+  delay(1000);
+  analogWrite(motorPin, 200);
+  delay(1000);
+}`
+  },
+  {
+    id: "stepper",
+    name: "Stepper Motor",
+    part: "28BYJ-48 + ULN2003 driver",
+    type: "actuator",
+    kit: "starter kit",
+    icon: "dial",
+    intro: "A motor that moves in discrete steps. It is good for turntables, sliders, calibrated shutters, and repeatable motion studies.",
+    connectionTitle: "Wiring",
+    pins: [
+      ["IN1", "D8"],
+      ["IN2", "D9"],
+      ["IN3", "D10"],
+      ["IN4", "D11"],
+      ["Power", "5V driver supply"]
+    ],
+    workshopUse: "Rotate a model slowly, index between facade positions, or move a small stage by a known amount.",
+    notes: [
+      "Use the driver board; do not wire the stepper directly to Arduino.",
+      "Steppers draw current while holding still.",
+      "Keep speed modest with the small 28BYJ-48 motor."
+    ],
+    codeTitle: "Stepper rotation",
+    code: `#include <Stepper.h>
+
+const int stepsPerRevolution = 2048;
+Stepper stepper(stepsPerRevolution, 8, 10, 9, 11);
+
+void setup() {
+  stepper.setSpeed(10);
+}
+
+void loop() {
+  stepper.step(512);
+  delay(500);
+  stepper.step(-512);
+  delay(500);
+}`
+  },
+  {
+    id: "relay",
+    name: "Relay Module",
+    part: "single-channel relay",
+    type: "output",
+    kit: "starter kit",
+    icon: "touch",
+    intro: "An electrically controlled switch. Use it to switch a separate low-voltage circuit from an Arduino pin.",
+    connectionTitle: "Wiring",
+    pins: [
+      ["VCC", "5V"],
+      ["GND", "GND"],
+      ["IN", "digital pin"],
+      ["Load", "COM + NO terminals"]
+    ],
+    workshopUse: "Switch low-voltage lamps, pumps, solenoids, or external demonstrator circuits from sensor logic.",
+    notes: [
+      "Avoid mains voltage in the workshop.",
+      "Some relay modules are active LOW.",
+      "Use MOSFET modules for fast PWM loads instead of relays."
+    ]
+  },
+  {
+    id: "display",
+    name: "Display Modules",
+    part: "I2C LCD / 7-segment / LED matrix",
+    type: "output",
+    kit: "smart home + starter kit",
+    icon: "axis",
+    intro: "Displays show values, modes, warnings, and debugging status so participants can understand what the robot thinks.",
+    connectionTitle: "Typical Wiring",
+    pins: [
+      ["I2C SDA", "A4 on Uno / kit SDA"],
+      ["I2C SCL", "A5 on Uno / kit SCL"],
+      ["VCC", "5V or 3.3V module dependent"],
+      ["GND", "GND"]
+    ],
+    workshopUse: "Show temperature, rain state, RFID access status, current robot mode, or countdowns during automated motion.",
+    notes: [
+      "I2C modules need the correct address, often 0x27 or 0x3F.",
+      "Displays are excellent for debugging before adding motors.",
+      "LED matrices and 7-segment displays are better for icons or numbers than long text."
+    ]
+  },
+  {
+    id: "led-buzzer",
+    name: "LEDs, RGB LED, and Buzzer",
+    part: "visual and audio feedback",
+    type: "output",
+    kit: "all starter kits + smart home kit",
+    icon: "sun",
+    intro: "Simple feedback elements for status, warnings, and testing. They help debug logic before connecting stronger actuators.",
+    connectionTitle: "Wiring",
+    pins: [
+      ["LED anode", "digital pin through resistor"],
+      ["LED cathode", "GND"],
+      ["Buzzer signal", "digital pin"],
+      ["RGB", "one PWM pin per color"]
+    ],
+    workshopUse: "Show sensor thresholds, alarm states, robot modes, countdowns, and successful RFID/keypad input.",
+    notes: [
+      "Always use resistors with bare LEDs.",
+      "PWM pins can dim LEDs.",
+      "Buzzers can be annoying during class; test briefly."
+    ],
+    codeTitle: "Blink and beep",
+    code: `const int ledPin = 13;
+const int buzzerPin = 8;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(ledPin, HIGH);
+  tone(buzzerPin, 1000, 100);
+  delay(500);
+  digitalWrite(ledPin, LOW);
+  delay(500);
+}`
+  },
+  {
+    id: "breadboard-wires",
+    name: "Breadboards, Jumper Wires, Terminals",
+    part: "connection hardware",
+    type: "build",
+    kit: "starter kits + extra wire budget",
+    icon: "track",
+    intro: "The physical connection layer for temporary circuits. Breadboards are for prototypes; terminal blocks and better wiring are for moving robots.",
+    connectionTitle: "Use",
+    pins: [
+      ["Breadboard rails", "5V and GND distribution"],
+      ["Jumper wires", "short signal connections"],
+      ["Terminal blocks", "motor and power wiring"],
+      ["Dupont leads", "module-to-board wiring"]
+    ],
+    workshopUse: "Prototype quickly on the bench, then secure wires before adding motion or mounting circuits inside models.",
+    notes: [
+      "Loose wires cause most beginner robot failures.",
+      "Use color convention: red for power, black for GND.",
+      "Moving platforms need strain relief and taped or tied cables."
+    ]
+  },
+  {
+    id: "passives",
+    name: "Resistors, Capacitors, Diodes, Transistors",
+    part: "basic electronic parts",
+    type: "build",
+    kit: "starter kits",
+    icon: "wave",
+    intro: "Support parts that make circuits safe and stable: resistors limit current, capacitors smooth power, diodes protect from coils, transistors switch loads.",
+    connectionTitle: "Common Uses",
+    pins: [
+      ["Resistor", "LED current limit / voltage divider"],
+      ["Capacitor", "power smoothing"],
+      ["Diode", "flyback protection"],
+      ["Transistor", "switch motors, fans, relays"]
+    ],
+    workshopUse: "Build sensor voltage dividers, protect relay or motor circuits, and switch loads that Arduino pins cannot drive directly.",
+    notes: [
+      "A 220 ohm resistor is typical for basic LEDs.",
+      "A 10K resistor is typical for pullups and LDR dividers.",
+      "Transistors and MOSFETs need a shared ground with the controller."
+    ]
+  },
+  {
+    id: "power",
+    name: "Batteries and Power Supplies",
+    part: "robot batteries, USB power, Pi battery",
+    type: "power",
+    kit: "robot car, Pi battery, smart home kit",
+    icon: "drop",
+    intro: "Power determines reliability. Motors and servos often need separate power from the controller, while all grounds must still connect.",
+    connectionTitle: "Power Rules",
+    pins: [
+      ["Arduino USB", "programming and light loads"],
+      ["Servo 5V", "external 5V supply"],
+      ["Motor battery", "driver motor input"],
+      ["Common GND", "connect all grounds"]
+    ],
+    workshopUse: "Plan power before building mobile robots, arms, or fans. Most unstable demos are actually power problems.",
+    notes: [
+      "Never short a battery.",
+      "Use the correct voltage for each board.",
+      "If servos twitch or the board resets, power is probably insufficient."
+    ]
+  },
+  {
+    id: "usb-storage",
+    name: "USB Pen Drives",
+    part: "5-pack storage",
+    type: "tool",
+    kit: "ordered workshop equipment",
+    icon: "axis",
+    intro: "Portable storage for sharing Arduino sketches, kit libraries, PDF instructions, drivers, and student project files.",
+    connectionTitle: "Use",
+    pins: [
+      ["Sketch archive", "copy final code"],
+      ["Libraries", "offline install backup"],
+      ["Documentation", "kit manuals"],
+      ["Project files", "photos and notes"]
+    ],
+    workshopUse: "Keep a known-good copy of all workshop sketches and drivers so students can recover quickly if their laptops are missing a library.",
+    notes: [
+      "Organize by day or exercise number.",
+      "Include tested versions of library ZIP files.",
+      "Do not use USB drives as the only backup for final projects."
+    ]
+  },
+  {
+    id: "storage-boxes",
+    name: "Euro Boxes",
+    part: "storage and transport boxes",
+    type: "tool",
+    kit: "ordered workshop equipment",
+    icon: "axis",
+    intro: "Storage boxes for keeping kits, robot parts, cables, tools, and unfinished student prototypes separated and transportable.",
+    connectionTitle: "Use",
+    pins: [
+      ["Box 1", "electronics and sensors"],
+      ["Box 2", "mechanical parts and tools"],
+      ["Labels", "group/project names"],
+      ["Protection", "avoid loose parts damage"]
+    ],
+    workshopUse: "Use boxes to prevent parts from mixing between groups and to store partially assembled robots overnight.",
+    notes: [
+      "Label each kit and return parts after each session.",
+      "Keep batteries in a separate marked area.",
+      "Small bags help prevent screws and sensor modules from disappearing."
+    ]
+  },
+  {
+    id: "screwdriver-kit",
+    name: "Electric Screwdriver Kit",
+    part: "assembly tool",
+    type: "tool",
+    kit: "ordered workshop equipment",
+    icon: "dial",
+    intro: "Speeds up assembly and disassembly of robot arms, car chassis, sensor mounts, and 3D printed brackets.",
+    connectionTitle: "Use",
+    pins: [
+      ["Small bits", "servo horns and modules"],
+      ["Torque care", "avoid stripping plastic"],
+      ["Manual finish", "tighten delicate screws by hand"],
+      ["Charging", "prepare before workshop"]
+    ],
+    workshopUse: "Use it for repetitive kit assembly, but finish delicate acrylic and plastic parts gently by hand.",
+    notes: [
+      "Do not overtighten servo horn screws.",
+      "Keep bits in the case.",
+      "Assign one tool station to avoid losing parts."
+    ]
+  },
+  {
+    id: "printer-tools",
+    name: "3D Printer Tools",
+    part: "deburring, cutting, finishing tools",
+    type: "tool",
+    kit: "ordered workshop equipment",
+    icon: "tilt",
+    intro: "Tools for cleaning prints, removing supports, trimming edges, and preparing custom brackets or end effectors.",
+    connectionTitle: "Use",
+    pins: [
+      ["Deburring", "clean holes and edges"],
+      ["Cutters", "remove supports"],
+      ["Tweezers", "small parts"],
+      ["Files", "fit servo mounts"]
+    ],
+    workshopUse: "Use them to adapt printed parts to sensors, servos, robot arms, and architectural models.",
+    notes: [
+      "Cut away from hands and cables.",
+      "Check fit gradually instead of removing too much material.",
+      "Printed parts near servos should not block movement."
+    ]
+  },
+  {
+    id: "laptop-stand",
+    name: "Laptop Stand",
+    part: "workstation support",
+    type: "tool",
+    kit: "ordered workshop equipment",
+    icon: "axis",
+    intro: "A simple support item, but useful in a robotics workshop because laptops sit beside moving hardware, cables, and tools.",
+    connectionTitle: "Use",
+    pins: [
+      ["Laptop", "coding and Serial Monitor"],
+      ["Bench space", "clear area for robot"],
+      ["Cable safety", "USB cable path"],
+      ["Viewing angle", "demo and debugging"]
+    ],
+    workshopUse: "Raise the laptop so the robot workspace remains clear and USB cables are less likely to drag moving models.",
+    notes: [
+      "Keep drinks away from electronics.",
+      "Route USB cables so robots cannot pull laptops.",
+      "Use the stand at shared demo stations."
+    ]
+  },
+  {
+    id: "software-ai",
+    name: "AI Software and Credits",
+    part: "Claude package / AI credits",
+    type: "software",
+    kit: "ordered software items",
+    icon: "axis",
+    intro: "Software support for ideation, code explanation, troubleshooting, documentation, and AI-assisted camera or design experiments.",
+    connectionTitle: "Use",
+    pins: [
+      ["Code help", "explain and modify sketches"],
+      ["Documentation", "summarize project steps"],
+      ["Vision ideas", "camera behavior planning"],
+      ["Troubleshooting", "interpret errors"]
+    ],
+    workshopUse: "Use AI as a teaching assistant for debugging and documentation, while students still test real circuits and understand the logic.",
+    notes: [
+      "Always verify generated Arduino code on hardware.",
+      "Keep pin maps consistent with the actual kit wiring.",
+      "Use AI outputs as drafts, not final truth."
+    ]
+  }
+];
+
+sensors.push(...hardwareElements);
+
 const examples = [
   {
     id: "rain-window",
