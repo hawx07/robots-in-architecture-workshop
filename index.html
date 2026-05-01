@@ -3,10 +3,87 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robots in Architecture - Hardware Library</title>
+    <title>Robots in Architecture - Home</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+      /* Custom tweaks to match Handbook aesthetics more closely on Home page */
+      .home-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        padding-bottom: 2.5rem; /* Reduced to move the line upwards */
+      }
+      .workshop-copy-custom {
+        flex: 0 0 65%; /* Extended width for better text flow */
+      }
+      .home-poster {
+        flex: 0 0 auto;
+        max-width: 500px;
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        border: 8px solid white;
+        object-fit: cover;
+        margin-right: -4rem; /* Expand/Move towards the right */
+      }
+      .home-content-layout {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 4rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem 4rem; /* Increased top padding to match prerequisites spacing */
+      }
+      .home-aside {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        border-right: 1px solid var(--border);
+        padding-right: 2rem;
+      }
+      .home-aside h3 {
+        color: var(--text);
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .home-main h2 {
+        margin-top: 3rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.5rem;
+      }
+      .home-main h2:first-child {
+        margin-top: 0;
+      }
+      .home-main pre {
+        background: var(--soft);
+        color: var(--ink);
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+      }
+      .home-main code {
+        color: #2c3e3a; /* Darker font color for better readability */
+        font-family: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+        font-size: 13px;
+      }
+      .home-section {
+        margin-bottom: 3rem;
+      }
+      @media (max-width: 1100px) {
+        .home-poster { margin-right: 0; }
+        .workshop-copy-custom { flex: 1; }
+      }
+      @media (max-width: 1000px) {
+        .home-hero { flex-direction: column; text-align: center; }
+        .home-content-layout { grid-template-columns: 1fr; }
+        .home-aside { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 2rem; }
+      }
+    </style>
   </head>
-  <body data-page="sensors">
+  <body data-page="home">
     <header class="topbar">
       <a class="brand" href="index.html" aria-label="Robots in Architecture">
         <span class="brand-mark" aria-hidden="true"></span>
@@ -16,43 +93,98 @@
         </span>
       </a>
       <nav class="nav-links" aria-label="Primary">
-        <a class="active" href="index.html">Hardware</a>
-        <a href="examples.html">Systems</a>
+        <a class="active" href="index.html">Home</a>
         <a href="guide.html">Handbook</a>
+        <a href="examples.html">Systems</a>
+        <a href="hardware.html">Hardware</a>
       </nav>
     </header>
 
     <main>
-      <section class="workshop-strip" aria-labelledby="page-title">
-        <div class="workshop-copy">
-          <p class="eyebrow">5-8 May 2026 - Room 4.206</p>
-          <h1 id="page-title">Hardware Library</h1>
-          <p>Beginner-ready usage notes, wiring references, and starter sketches for the controllers, sensors, actuators, power parts, build components, and robot platforms used in the workshop systems.</p>
-          <div class="inventory-pills" id="inventory-pills" aria-label="Available hardware"></div>
-        </div>
-        <div class="bench-visual" aria-hidden="true">
-          <div class="board">
-            <span></span><span></span><span></span><span></span>
-            <b></b>
+      <section class="workshop-strip guide-hero">
+        <div class="home-hero" style="max-width: 1200px; margin: 0 auto; width: 100%;">
+          <div class="workshop-copy workshop-copy-custom">
+            <p class="eyebrow">5-8 May 2026 - Room 4.206</p>
+            <h1>Welcome to the DIY Robotics Workshop!</h1>
+            <p>Exploring the intersection of open-source hardware and experimental architectural design. This intensive four-day session introduces you to the logic of kinetic models and smart environments.</p>
           </div>
-          <div class="wire wire-a"></div>
-          <div class="wire wire-b"></div>
-          <div class="sensor-chip">
-            <i></i><i></i><i></i>
-          </div>
-          <div class="servo-dial"></div>
+          <img src="images/welcome_poster.jpg" alt="Workshop Poster" class="home-poster">
         </div>
       </section>
 
-      <section class="controls" aria-label="Hardware filters">
-        <label class="search">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3m2.3-5.2a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
-          <input id="sensor-search" type="search" placeholder="Search hardware, pins, uses">
-        </label>
-        <div class="filter-group" id="sensor-filters" aria-label="Hardware categories"></div>
-      </section>
+      <div class="home-content-layout">
+        <aside class="home-aside">
+          <h3>Quick Info</h3>
+          <p><strong>Location:</strong> Room 4.206</p>
+          <p><strong>Supervision:</strong><br>Prof. Hans Sachs<br>Yusuf Aykin<br>Hrithik Shetty</p>
+          <p><strong>Dates:</strong> May 5 - May 8</p>
+          <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--border);">
+          <p><em>No technical background required. Just bring your curiosity and laptop.</em></p>
+        </aside>
 
-      <section class="grid" id="sensor-grid" aria-live="polite"></section>
+        <article class="home-main">
+          <section class="home-section">
+            <h2>1. What is Arduino?</h2>
+            <p>Think of Arduino as the "brain" of your robot. It is a small computer (microcontroller) that can read information from sensors (like eyes) and send instructions to motors (like muscles).</p>
+            
+            <h2>2. The Arduino IDE</h2>
+            <p>The <strong>IDE</strong> (Integrated Development Environment) is the software we use on our laptops to write code and "upload" it to the Arduino brain via a USB cable.</p>
+
+            <h2>3. Anatomy of a "Sketch"</h2>
+            <p>Every Arduino program has two main parts. Think of it like a recipe:</p>
+            <pre><code>void setup() {
+  // This happens ONLY ONCE when the robot starts.
+  // Use this to "wake up" the motors or sensors.
+}
+
+void loop() {
+  // This happens OVER AND OVER AGAIN forever.
+  // This is where the "logic" of the robot lives.
+}</code></pre>
+
+            <h2>4. Data "Knobs"</h2>
+            <p>In your provided modular code, you will see variables. To change how the robot behaves, you will "tweak" these values:</p>
+            <ul class="guide-list">
+              <li><strong>int (Integers):</strong> Whole numbers. Used for speed or pin numbers.</li>
+              <li><strong>float (Floating point):</strong> Numbers with decimals. Used for precise distances or angles.</li>
+              <li><strong>bool (Boolean):</strong> Simple <strong>True</strong> or <strong>False</strong> (e.g., lights on/off).</li>
+            </ul>
+
+            <h2>5. Basic Syntax</h2>
+            <p>Computers are very literal. If you miss a tiny symbol, the code won't run:</p>
+            <ul class="guide-list">
+              <li><strong>Semicolons ( ; ):</strong> Every instruction must end with a <code>;</code>.</li>
+              <li><strong>Curly Braces ( { } ):</strong> These group blocks of code together. If you open one, you MUST close it.</li>
+              <li><strong>Comments ( // ):</strong> Notes for humans to explain what the code does; ignored by the robot.</li>
+            </ul>
+
+            <section class="home-section" id="prerequisites" style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
+              <p class="eyebrow">Before we start</p>
+              <h2>Workshop Pre-requisites</h2>
+              <p>To follow the workshop, you must have the <strong>Arduino IDE</strong> installed on your laptop. For additional information, you may visit the official website <a href="https://www.arduino.cc/en/software" target="_blank" style="color: var(--green); text-decoration: underline;">Arduino IDE</a>.</p>
+
+              <div class="step-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+                  <article style="background: var(--soft); padding: 1.5rem; border-radius: 8px;">
+                      <a href="https://downloads.arduino.cc/arduino-ide/arduino-ide_latest_Windows_64bit.exe" style="display: block; margin-bottom: 0.5rem; color: var(--green); font-weight: bold; text-decoration: underline;">Windows (Win 10+)</a>
+                      <ul class="guide-list" style="font-size: 0.9rem;">
+                          <li>Download and run the installer above.</li>
+                          <li>Follow the setup prompts.</li>
+                          <li>If asked to install drivers, click <strong>Install/Yes</strong>.</li>
+                      </ul>
+                  </article>
+                  <article style="background: var(--soft); padding: 1.5rem; border-radius: 8px;">
+                      <a href="https://downloads.arduino.cc/arduino-ide/arduino-ide_latest_macOS_64bit.dmg" style="display: block; margin-bottom: 0.5rem; color: var(--green); font-weight: bold; text-decoration: underline;">macOS (10.15+)</a>
+                      <ul class="guide-list" style="font-size: 0.9rem;">
+                          <li>Download the installer above.</li>
+                          <li>Open the <code>.dmg</code> file.</li>
+                          <li><strong>Drag and drop</strong> the Arduino icon into your Applications folder.</li>
+                      </ul>
+                  </article>
+              </div>
+            </section>
+          </section>
+        </article>
+      </div>
     </main>
 
     <script src="data.js"></script>
