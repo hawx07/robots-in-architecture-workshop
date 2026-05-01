@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Robots in Architecture - Sensor Library</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body data-page="sensors">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Robots in Architecture">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>
+          <strong>Robots in Architecture</strong>
+          <small>Arduino workshop kit</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a class="active" href="index.html">Sensors</a>
+        <a href="examples.html">Systems</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="workshop-strip" aria-labelledby="page-title">
+        <div class="workshop-copy">
+          <p class="eyebrow">5-8 May 2026 · Room 4.206</p>
+          <h1 id="page-title">Sensor Library</h1>
+          <p>Beginner-ready wiring notes and Arduino sketches for the parts most likely to appear in the starter kits.</p>
+          <div class="inventory-pills" id="inventory-pills" aria-label="Available hardware"></div>
+        </div>
+        <div class="bench-visual" aria-hidden="true">
+          <div class="board">
+            <span></span><span></span><span></span><span></span>
+            <b></b>
+          </div>
+          <div class="wire wire-a"></div>
+          <div class="wire wire-b"></div>
+          <div class="sensor-chip">
+            <i></i><i></i><i></i>
+          </div>
+          <div class="servo-dial"></div>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Sensor filters">
+        <label class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3m2.3-5.2a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+          <input id="sensor-search" type="search" placeholder="Search sensors, pins, uses">
+        </label>
+        <div class="filter-group" id="sensor-filters" aria-label="Sensor categories"></div>
+      </section>
+
+      <section class="grid" id="sensor-grid" aria-live="polite"></section>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

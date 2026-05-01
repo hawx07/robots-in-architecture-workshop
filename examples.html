@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Robots in Architecture - System Examples</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body data-page="examples">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Robots in Architecture">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>
+          <strong>Robots in Architecture</strong>
+          <small>Arduino workshop kit</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Sensors</a>
+        <a class="active" href="examples.html">Systems</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="workshop-strip systems-strip" aria-labelledby="page-title">
+        <div class="workshop-copy">
+          <p class="eyebrow">Sensors + motors + materials</p>
+          <h1 id="page-title">System Examples</h1>
+          <p>Complete patterns for turning simple readings into robotic behavior, from facade movement to rover logic.</p>
+          <div class="inventory-pills" id="inventory-pills" aria-label="Available hardware"></div>
+        </div>
+        <div class="system-diagram" aria-hidden="true">
+          <span>Sense</span>
+          <i></i>
+          <span>Decide</span>
+          <i></i>
+          <span>Move</span>
+        </div>
+      </section>
+
+      <section class="actuator-band" aria-labelledby="actuator-title">
+        <div>
+          <p class="eyebrow">Output reference</p>
+          <h2 id="actuator-title">Actuators</h2>
+        </div>
+        <div class="actuator-grid" id="actuator-grid"></div>
+      </section>
+
+      <section class="grid examples-grid" id="examples-grid" aria-live="polite"></section>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
