@@ -7,33 +7,22 @@
     <link rel="stylesheet" href="styles.css">
     <style>
       /* Custom tweaks to match Handbook aesthetics more closely on Home page */
-      .home-hero {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 2rem;
-        padding-bottom: 2.5rem; /* Reduced to move the line upwards */
-      }
-      .workshop-copy-custom {
-        flex: 0 0 65%; /* Extended width for better text flow */
-      }
       .home-poster {
-        flex: 0 0 auto;
-        max-width: 500px;
         width: 100%;
-        border-radius: 8px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        border: 8px solid white;
+        max-width: 410px; /* Matching the max-width of the second column in global workshop-strip */
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        border: none;
         object-fit: cover;
-        margin-right: -4rem; /* Expand/Move towards the right */
+        margin-top: 32px; /* Horizontally align top with "Welcome" text (below eyebrow) */
       }
       .home-content-layout {
         display: grid;
         grid-template-columns: 250px 1fr;
         gap: 4rem;
-        max-width: 1200px;
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 4rem 2rem 4rem; /* Increased top padding to match prerequisites spacing */
+        padding: 4rem 0;
       }
       .home-aside {
         font-size: 0.9rem;
@@ -72,12 +61,7 @@
       .home-section {
         margin-bottom: 3rem;
       }
-      @media (max-width: 1100px) {
-        .home-poster { margin-right: 0; }
-        .workshop-copy-custom { flex: 1; }
-      }
       @media (max-width: 1000px) {
-        .home-hero { flex-direction: column; text-align: center; }
         .home-content-layout { grid-template-columns: 1fr; }
         .home-aside { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 2rem; }
       }
@@ -102,14 +86,12 @@
 
     <main>
       <section class="workshop-strip guide-hero">
-        <div class="home-hero" style="max-width: 1200px; margin: 0 auto; width: 100%;">
-          <div class="workshop-copy workshop-copy-custom">
-            <p class="eyebrow">5-8 May 2026 - Room 4.206</p>
-            <h1>Welcome to the DIY Robotics Workshop!</h1>
-            <p>Exploring the intersection of open-source hardware and experimental architectural design. This intensive four-day session introduces you to the logic of kinetic models and smart environments.</p>
-          </div>
-          <img src="images/welcome_poster.jpg" alt="Workshop Poster" class="home-poster">
+        <div class="workshop-copy">
+          <p class="eyebrow">5-8 May 2026 - Room 4.206</p>
+          <h1>Welcome to the DIY Robotics Workshop!</h1>
+          <p>Exploring the intersection of open-source hardware and experimental architectural design. This intensive four-day session introduces you to the logic of kinetic models and smart environments.</p>
         </div>
+        <img src="images/welcome_poster.jpg" alt="Workshop Poster" class="home-poster">
       </section>
 
       <div class="home-content-layout">
@@ -158,7 +140,9 @@ void loop() {
               <li><strong>Comments ( // ):</strong> Notes for humans to explain what the code does; ignored by the robot.</li>
             </ul>
 
-            <section class="home-section" id="prerequisites" style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
+            <hr style="margin: 2.5rem 0 0; border: 0; border-top: 1px solid var(--line);">
+
+            <section class="home-section" id="prerequisites" style="padding-top: 4rem;">
               <p class="eyebrow">Before we start</p>
               <h2>Workshop Pre-requisites</h2>
               <p>To follow the workshop, you must have the <strong>Arduino IDE</strong> installed on your laptop. For additional information, you may visit the official website <a href="https://www.arduino.cc/en/software" target="_blank" style="color: var(--green); text-decoration: underline;">Arduino IDE</a>.</p>
