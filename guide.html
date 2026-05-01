@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Robots in Architecture - Beginner Handbook</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body data-page="guide">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Robots in Architecture">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>
+          <strong>Robots in Architecture</strong>
+          <small>Arduino workshop kit</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Hardware</a>
+        <a href="examples.html">Systems</a>
+        <a class="active" href="guide.html">Handbook</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="workshop-strip guide-hero" aria-labelledby="page-title">
+        <div class="workshop-copy">
+          <p class="eyebrow">Start here</p>
+          <h1 id="page-title">Beginner Handbook</h1>
+          <p>A practical reference for building Arduino-based robotic models: electronics basics, wiring habits, sensor reading, actuator control, power planning, debugging, and safe workshop workflow.</p>
+        </div>
+        <div class="guide-stack" aria-hidden="true">
+          <span>1. Wire</span>
+          <span>2. Read</span>
+          <span>3. Decide</span>
+          <span>4. Move</span>
+          <span>5. Debug</span>
+        </div>
+      </section>
+
+      <section class="guide-layout">
+        <aside class="guide-toc" aria-label="Handbook contents">
+          <a href="#workflow">Workflow</a>
+          <a href="#electricity">Electricity</a>
+          <a href="#breadboard">Breadboard</a>
+          <a href="#pins">Pins</a>
+          <a href="#sensors">Sensors</a>
+          <a href="#actuators">Actuators</a>
+          <a href="#power">Power</a>
+          <a href="#code">Code Patterns</a>
+          <a href="#debugging">Debugging</a>
+          <a href="#safety">Safety</a>
+          <a href="#glossary">Glossary</a>
+        </aside>
+
+        <div class="guide-content">
+          <section class="guide-section" id="workflow">
+            <p class="eyebrow">Build order</p>
+            <h2>Recommended Workflow</h2>
+            <div class="step-grid">
+              <article><strong>1. Test one part</strong><p>Wire one sensor or actuator alone. Run the smallest sketch that proves it works.</p></article>
+              <article><strong>2. Print values</strong><p>Use Serial Monitor before moving motors. Know the real sensor range in the room.</p></article>
+              <article><strong>3. Choose thresholds</strong><p>Write down dry/wet, bright/dark, near/far, hot/cool values from the actual setup.</p></article>
+              <article><strong>4. Add one actuator</strong><p>Connect a servo, LED, buzzer, fan, or motor driver after the sensor is stable.</p></article>
+              <article><strong>5. Combine slowly</strong><p>Add the next sensor only after the previous behavior is predictable.</p></article>
+              <article><strong>6. Mount and retest</strong><p>Values change after parts are mounted inside models. Calibrate again.</p></article>
+            </div>
+          </section>
+
+          <section class="guide-section" id="electricity">
+            <p class="eyebrow">Core concepts</p>
+            <h2>Electricity Basics</h2>
+            <div class="reference-table">
+              <table>
+                <thead><tr><th>Concept</th><th>Meaning</th><th>Workshop Rule</th></tr></thead>
+                <tbody>
+                  <tr><td>Voltage</td><td>Electrical pressure, measured in volts.</td><td>Use the voltage the module expects: 5V, 3.3V, or motor battery voltage.</td></tr>
+                  <tr><td>Current</td><td>How much electricity flows, measured in amps.</td><td>Motors and servos need much more current than sensors.</td></tr>
+                  <tr><td>Ground</td><td>The common reference point for all signals.</td><td>Separate supplies still need shared GND for signals to work.</td></tr>
+                  <tr><td>Resistance</td><td>Limits current or forms voltage dividers.</td><td>Use resistors with LEDs and LDR circuits.</td></tr>
+                  <tr><td>Short circuit</td><td>Power connected directly to ground.</td><td>Disconnect immediately if parts heat up, smell, or reset the board.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="guide-section warning-section">
+            <h2>Rules That Prevent Most Failures</h2>
+            <ul class="guide-list">
+              <li>Never power a DC motor or multiple servos directly from an Arduino pin.</li>
+              <li>Connect all grounds together when using separate power supplies.</li>
+              <li>Put a resistor in series with every bare LED.</li>
+              <li>Check polarity before powering modules: VCC to VCC, GND to GND.</li>
+              <li>Upload and test code before installing electronics deep inside a model.</li>
+              <li>Secure wires on anything that moves.</li>
+            </ul>
+          </section>
+
+          <section class="guide-section" id="breadboard">
+            <p class="eyebrow">Making circuits</p>
+            <h2>Breadboards and Wiring</h2>
+            <div class="two-info">
+              <div>
+                <h3>Breadboard Layout</h3>
+                <p>Rows are connected horizontally in the middle area. Power rails run vertically along the sides, but some boards split rails halfway, so test or bridge them if needed.</p>
+              </div>
+              <div>
+                <h3>Color Convention</h3>
+                <p>Use red for 5V or 3.3V, black or blue for GND, yellow/white/green for signal. Consistent colors make debugging faster.</p>
+              </div>
+            </div>
+            <div class="reference-table">
+              <table>
+                <thead><tr><th>Part</th><th>Typical Use</th><th>Common Mistake</th></tr></thead>
+                <tbody>
+                  <tr><td>Jumper wires</td><td>Temporary signal and power links.</td><td>Loose wires pulled by moving parts.</td></tr>
+                  <tr><td>10K resistor</td><td>Pullup/pulldown and LDR voltage divider.</td><td>Forgetting the resistor, so analog readings float.</td></tr>
+                  <tr><td>220 ohm resistor</td><td>LED current limiting.</td><td>Connecting LED directly to 5V.</td></tr>
+                  <tr><td>Capacitor</td><td>Smoothing power or reducing noise.</td><td>Wrong polarity on electrolytic capacitors.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="guide-section" id="pins">
+            <p class="eyebrow">Inputs and outputs</p>
+            <h2>Arduino Pin Types</h2>
+            <div class="step-grid">
+              <article><strong>Digital input</strong><p>Reads HIGH or LOW. Use for buttons, PIR sensors, tilt switches, line sensors, and IR modules.</p></article>
+              <article><strong>Digital output</strong><p>Turns something on/off. Use for LEDs, buzzers, relays, and driver inputs.</p></article>
+              <article><strong>Analog input</strong><p>Reads 0-1023 on Arduino Uno. Use for LDR, potentiometer, joystick, sound, gas, rain, and temperature sensors.</p></article>
+              <article><strong>PWM output</strong><p>Simulates analog output with fast pulses. Use for LED dimming and DC motor speed through a driver.</p></article>
+              <article><strong>I2C</strong><p>Two-wire bus, usually SDA/SCL. Use for LCD modules and some sensor boards.</p></article>
+              <article><strong>SPI</strong><p>Fast multi-wire bus. Common for RC522 RFID modules.</p></article>
+            </div>
+          </section>
+
+          <section class="guide-section" id="sensors">
+            <p class="eyebrow">Reading the world</p>
+            <h2>How to Use Sensors</h2>
+            <div class="reference-table">
+              <table>
+                <thead><tr><th>Sensor Type</th><th>First Test</th><th>How to Use It Well</th></tr></thead>
+                <tbody>
+                  <tr><td>Analog sensors</td><td>Print analogRead values.</td><td>Record low/high values in the real environment and map them to 0-100 percent.</td></tr>
+                  <tr><td>Digital sensors</td><td>Print digitalRead state.</td><td>Check whether active means HIGH or LOW before writing behavior.</td></tr>
+                  <tr><td>Distance</td><td>Print centimeters.</td><td>Average multiple readings and ignore impossible zeros.</td></tr>
+                  <tr><td>Temperature/humidity</td><td>Print every 2 seconds.</td><td>Read slowly and keep away from motor heat.</td></tr>
+                  <tr><td>RFID/IR</td><td>Print IDs or button codes.</td><td>Write down the actual card UID or remote code before using it in logic.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="guide-section" id="actuators">
+            <p class="eyebrow">Making movement</p>
+            <h2>How to Use Actuators</h2>
+            <div class="reference-table">
+              <table>
+                <thead><tr><th>Actuator</th><th>Good For</th><th>Power Rule</th></tr></thead>
+                <tbody>
+                  <tr><td>Servo</td><td>Angles, hinges, grippers, doors, shutters.</td><td>External 5V for multiple or loaded servos.</td></tr>
+                  <tr><td>DC motor/fan</td><td>Wheels, airflow, pumps, spinning parts.</td><td>Use a driver, transistor, or MOSFET.</td></tr>
+                  <tr><td>Stepper</td><td>Repeatable rotation and indexing.</td><td>Use its driver board and a suitable supply.</td></tr>
+                  <tr><td>Relay</td><td>Switching separate low-voltage circuits.</td><td>Avoid mains voltage in the workshop.</td></tr>
+                  <tr><td>LED/buzzer/display</td><td>Status, warnings, debugging.</td><td>Use resistors for bare LEDs and correct display voltage.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="guide-section" id="power">
+            <p class="eyebrow">Reliability</p>
+            <h2>Power Planning</h2>
+            <div class="two-info">
+              <div>
+                <h3>Separate Logic and Motion</h3>
+                <p>Arduino USB can power the board and small sensors. Servos, fans, and motors should usually use a separate supply or the kit battery.</p>
+              </div>
+              <div>
+                <h3>Share Ground</h3>
+                <p>If the actuator supply is separate, connect its GND to Arduino GND. Without common ground, signal pins have no shared reference.</p>
+              </div>
+            </div>
+            <ul class="guide-list">
+              <li>If the board resets when a servo moves, the power supply is too weak or wiring is poor.</li>
+              <li>If a motor does not move but the code runs, check driver power and enable pins.</li>
+              <li>If sensors become noisy when motors run, separate motor power wires from signal wires and add smoothing capacitors if available.</li>
+            </ul>
+          </section>
+
+          <section class="guide-section" id="code">
+            <p class="eyebrow">Reusable logic</p>
+            <h2>Code Patterns</h2>
+            <h3>Threshold With Hysteresis</h3>
+            <pre><code>bool openState = false;
+
+if (!openState && value > openThreshold) {
+  openState = true;
+}
+
+if (openState && value < closeThreshold) {
+  openState = false;
+}</code></pre>
+            <h3>Analog Sensor Mapping</h3>
+            <pre><code>int raw = analogRead(A0);
+int percent = map(raw, dryValue, wetValue, 0, 100);
+percent = constrain(percent, 0, 100);</code></pre>
+            <h3>Button Toggle With INPUT_PULLUP</h3>
+            <pre><code>bool state = false;
+bool lastButton = HIGH;
+
+bool button = digitalRead(buttonPin);
+if (button == LOW && lastButton == HIGH) {
+  state = !state;
+  delay(40);
+}
+lastButton = button;</code></pre>
+            <h3>Non-Blocking Timing</h3>
+            <pre><code>unsigned long lastUpdate = 0;
+
+if (millis() - lastUpdate > 500) {
+  lastUpdate = millis();
+  readSensor();
+  updateActuator();
+}</code></pre>
+          </section>
+
+          <section class="guide-section" id="debugging">
+            <p class="eyebrow">When it fails</p>
+            <h2>Debugging Checklist</h2>
+            <ol class="guide-list ordered">
+              <li>Does the board power LED turn on?</li>
+              <li>Is the correct board and port selected in Arduino IDE?</li>
+              <li>Does a simple blink sketch upload?</li>
+              <li>Are VCC and GND correct on the module?</li>
+              <li>Are all grounds connected when using separate power?</li>
+              <li>Does Serial Monitor show sensor values?</li>
+              <li>Are the real values crossing the threshold in your code?</li>
+              <li>Can the actuator work in a separate minimal test sketch?</li>
+              <li>Does the behavior still work after mounting in the model?</li>
+            </ol>
+          </section>
+
+          <section class="guide-section" id="safety">
+            <p class="eyebrow">Workshop practice</p>
+            <h2>Safety and Build Quality</h2>
+            <ul class="guide-list">
+              <li>Disconnect power before changing motor, servo, or battery wiring.</li>
+              <li>Keep fingers clear of robot arm joints, gears, and wheels during upload and reset.</li>
+              <li>Use low-voltage loads only unless supervised by qualified staff.</li>
+              <li>Do not leave batteries charging unattended.</li>
+              <li>Add strain relief to wires on moving parts.</li>
+              <li>Document final pin maps and thresholds directly in the sketch comments.</li>
+            </ul>
+          </section>
+
+          <section class="guide-section" id="glossary">
+            <p class="eyebrow">Vocabulary</p>
+            <h2>Glossary</h2>
+            <div class="reference-table">
+              <table>
+                <tbody>
+                  <tr><td>Sketch</td><td>An Arduino program.</td></tr>
+                  <tr><td>Library</td><td>Reusable code installed in Arduino IDE for parts like DHT, Servo, RFID, or IR remote.</td></tr>
+                  <tr><td>Threshold</td><td>A value where behavior changes, such as dark/bright or near/far.</td></tr>
+                  <tr><td>Calibration</td><td>Measuring real sensor values and tuning code for the actual setup.</td></tr>
+                  <tr><td>Driver</td><td>A circuit that lets a low-power controller command a higher-current motor or load.</td></tr>
+                  <tr><td>Common ground</td><td>A shared GND connection between controller and external power supply.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

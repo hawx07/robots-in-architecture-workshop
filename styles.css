@@ -127,6 +127,7 @@ main {
 
 .workshop-copy {
   align-self: center;
+  min-width: 0;
 }
 
 .eyebrow {
@@ -687,11 +688,166 @@ dt {
   font-weight: 750;
 }
 
+.guide-stack {
+  display: grid;
+  gap: 12px;
+  align-content: center;
+  min-height: 260px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px;
+  background: #f6faf7;
+  box-shadow: var(--shadow);
+}
+
+.guide-stack span {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #fff;
+  font-weight: 850;
+}
+
+.guide-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 28px;
+  padding-top: 24px;
+}
+
+.guide-toc {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.guide-toc a {
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.guide-toc a:hover {
+  background: var(--soft);
+  color: var(--green);
+}
+
+.guide-content {
+  display: grid;
+  gap: 18px;
+}
+
+.guide-section {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(18px, 3vw, 28px);
+  background: #fff;
+}
+
+.guide-section.warning-section {
+  border-color: rgba(190, 75, 73, 0.35);
+  background: #fff8f7;
+}
+
+.step-grid,
+.two-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.step-grid article,
+.two-info > div {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fbfdfc;
+}
+
+.step-grid strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.step-grid p,
+.two-info p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.reference-table {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.reference-table table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.reference-table th,
+.reference-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 11px 12px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+.reference-table th {
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.reference-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.reference-table td:first-child {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.guide-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.guide-list li {
+  margin-bottom: 8px;
+}
+
+.guide-list.ordered {
+  padding-left: 22px;
+}
+
 @media (max-width: 980px) {
   .workshop-strip,
   .controls,
-  .actuator-band {
+  .actuator-band,
+  .guide-layout {
     grid-template-columns: 1fr;
+  }
+
+  .guide-toc {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .filter-group {
@@ -706,6 +862,11 @@ dt {
 }
 
 @media (max-width: 720px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
   .topbar {
     align-items: stretch;
     flex-direction: column;
@@ -714,10 +875,17 @@ dt {
 
   .nav-links {
     width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    gap: 0;
+    padding: 3px;
   }
 
   .nav-links a {
     flex: 1;
+    min-width: 0;
+    padding-inline: 4px;
+    font-size: 12px;
     text-align: center;
   }
 
@@ -732,7 +900,8 @@ dt {
   }
 
   h1 {
-    font-size: 42px;
+    overflow-wrap: anywhere;
+    font-size: 34px;
   }
 
   .workshop-copy p:not(.eyebrow) {
@@ -742,7 +911,9 @@ dt {
   .grid,
   .detail-layout,
   .detail-layout.two-column,
-  .actuator-grid {
+  .actuator-grid,
+  .step-grid,
+  .two-info {
     grid-template-columns: 1fr;
   }
 
