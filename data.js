@@ -1,11 +1,8 @@
 const inventorySummary = [
-  "Keyestudio ESP32 smart home kit",
-  "Keyestudio/Arduino starter kits",
-  "ELEGOO Smart Robot Car V4 with camera",
-  "Mini robot arm kits",
-  "Fabri Creator robot arm parts",
-  "Raspberry Pi Zero 2 W with AI Camera",
-  "Freenove crawling robot"
+  "Keyestudio Smart Robot Arm (FKS0003)",
+  "Keyestudio IoT Smart Home Kit (KS5009)",
+  "Keyestudio ESP32 Smart Farm Kit (KS0567)",
+  "Freenove Tank Robot Kit (FNK0077)"
 ];
 
 const sensors = [
